@@ -17,6 +17,13 @@ uv sync
 # Run the agent with a query
 uv run agent7.py "Your query here"
 
+# Run a pre-defined query from queries/ (clears state by default)
+bash run_query.sh <id>             # id: a, b, c1, c2, d, e, f1, f2, g, h
+bash run_query.sh f2 --no-clear   # keep prior state (required for cross-run queries C2, F2, G, H)
+
+# Run all pre-defined queries in sequence
+bash run_all.sh
+
 # Run all tests
 uv run pytest
 
@@ -27,8 +34,9 @@ uv run pytest -m embed        # tests requiring the gateway embed endpoint
 # Run MCP server standalone (stdio transport)
 uv run mcp_server.py
 
-# Reset agent state (clears memory and FAISS index)
-rm -f state/memory.json state/index.faiss state/index_ids.json
+# Reset agent state (clears memory, artifacts, FAISS index, sandbox txt files)
+bash clear_state.sh
+# FAISS index only: rm -f state/index.faiss state/index_ids.json
 ```
 
 ## Prerequisites
@@ -47,12 +55,17 @@ rm -f state/memory.json state/index.faiss state/index_ids.json
 | Decision | `decision.py` | Picks next action for one goal: emit an answer or call one MCP tool. Sees the full tool catalogue. |
 | Action | `action.py` | Executes MCP tool calls via `ClientSession`; pushes large payloads to artifact store. |
 | Memory | `memory.py` | Read/write typed `MemoryItem` records. Reads: FAISS vector search first, keyword fallback. Writes: embed at insert time for `fact`/`preference`/`tool_outcome`. |
+| Artifact store | `artifacts.py` | Content-addressed blob store (`art:` handles). Backing store for Action's large-payload offload. |
 
 **Agent loop** (`agent7.py`): memory.read → perception.observe → decision.next_step → action.execute → memory.record_outcome. Max 20 iterations. MCP server runs as a subprocess (stdio transport).
+
+**Artifact store** (`artifacts.py`): content-addressed blob store. `put()` returns an `art:`-prefixed handle; `get_bytes()` / `get_meta()` retrieve content and metadata. Blobs written to `state/artifacts/` as `.bin` + `.json` pairs. Action offloads tool results > 4 KB here.
 
 **Schemas** (`schemas.py`): Single source of truth for `MemoryItem`, `Goal`, `Observation`, `ToolCall`, `DecisionOutput`. All inter-role communication uses these Pydantic models.
 
 **Vector index** (`vector_index.py`): Wraps FAISS `IndexFlatIP` with L2-normalized vectors (cosine similarity). Persisted to `state/index.faiss` + `state/index_ids.json`. Reloaded from disk on every call for cross-process consistency (agent + MCP subprocess both write to it).
+
+**Pre-defined queries** (`queries/`): `query_a.txt` … `query_h.txt` hold the eight required test queries (A–H from PLAN.md Steps 9–16). Queries C2, F2, G, H require `--no-clear` to inherit state from a prior run.
 
 **MCP tools** (`mcp_server.py`): 11 tools — `web_search`, `fetch_url`, `get_time`, `currency_convert`, `read_file`, `list_dir`, `create_file`, `update_file`, `edit_file`, `index_document`, `search_knowledge`. File tools are sandboxed under `./sandbox/`.
 
