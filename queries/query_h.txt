@@ -1,0 +1,1 @@
+Compare how the ReAct paper and the Chain-of-Thought paper differ in their treatment of intermediate reasoning.

@@ -1,0 +1,1 @@
+Index every .md file under papers/. Confirm how many chunks were indexed in total.
