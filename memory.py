@@ -29,7 +29,7 @@ from pathlib import Path
 from pydantic import BaseModel, Field
 
 from gateway import LLM, embed as _gateway_embed, ensure_gateway
-from schemas import MemoryItem, ToolCall, new_id
+from schemas import MemoryItem, MemoryKind, ToolCall, new_id
 from vector_index import VectorIndex
 
 STATE_PATH = Path(__file__).parent / "state" / "memory.json"
@@ -176,8 +176,7 @@ def read(
 
 class _Classification(BaseModel):
     """What the LLM classifier returns for an ambiguous free-form write."""
-
-    kind: str
+    kind: MemoryKind
     descriptor: str
     keywords: list[str] = Field(default_factory=list)
     value: dict = Field(default_factory=dict)
@@ -190,7 +189,7 @@ def _persist_item(item: MemoryItem) -> MemoryItem:
     items.append(item)
     _save(items)
     if item.embedding is not None and item.kind in _EMBEDDABLE_KINDS:
-        idx = _index()
+        idx = VectorIndex(STATE_PATH.parent)
         idx.add(item.id, item.embedding)
         idx.persist()
     return item
@@ -234,25 +233,24 @@ def remember(
     schema = _Classification.model_json_schema()
     try:
         reply = _llm_classify(raw_text, schema)
+        parsed = reply.get("parsed") or {}
+        # NOTES_RUNS §6 (2): the classifier at temp=1.0 sometimes returns an
+        # empty `value` dict (the C-run-1 birthday case), discarding the only
+        # structured handle to the raw content. If `value` is empty or missing,
+        # fall back to {"raw": raw_text} so the originating text is at least
+        # always retrievable from the saved item.
+        parsed_value = parsed.get("value")
+        if not parsed_value:
+            parsed_value = {"raw": raw_text}
+        c = _Classification.model_validate({
+            "kind": parsed.get("kind", "fact"),
+            "descriptor": parsed.get("descriptor", raw_text[:120]),
+            "keywords": parsed.get("keywords") or list(_tokens(raw_text))[:10],
+            "value": parsed_value,
+        })
     except Exception as e:
         print(f"[memory.remember] classifier failed ({e!r}); falling back to fact-write")
         return _fallback_remember(raw_text, source=source, run_id=run_id, goal_id=goal_id)
-
-    parsed = reply.get("parsed") or {}
-    # NOTES_RUNS §6 (2): the classifier at temp=1.0 sometimes returns an
-    # empty `value` dict (the C-run-1 birthday case), discarding the only
-    # structured handle to the raw content. If `value` is empty or missing,
-    # fall back to {"raw": raw_text} so the originating text is at least
-    # always retrievable from the saved item.
-    parsed_value = parsed.get("value")
-    if not parsed_value:
-        parsed_value = {"raw": raw_text}
-    c = _Classification.model_validate({
-        "kind": parsed.get("kind", "fact"),
-        "descriptor": parsed.get("descriptor", raw_text[:120]),
-        "keywords": parsed.get("keywords") or list(_tokens(raw_text))[:10],
-        "value": parsed_value,
-    })
 
     embedding: list[float] | None = None
     if c.kind in _EMBEDDABLE_KINDS:
@@ -260,7 +258,7 @@ def remember(
 
     item = MemoryItem(
         id=new_id("mem"),
-        kind=c.kind,  # type: ignore[arg-type]
+        kind=c.kind,
         keywords=[k.lower() for k in c.keywords],
         descriptor=c.descriptor,
         value=c.value,
@@ -272,25 +270,14 @@ def remember(
     return _persist_item(item)
 
 
+_CLASSIFY_PROMPT_PATH = Path(__file__).parent / "prompts" / "memory_classify.txt"
+
+
 def _llm_classify(raw_text: str, schema: dict) -> dict:
+    template = _CLASSIFY_PROMPT_PATH.read_text()
+    prompt = template.replace("{raw_text}", repr(raw_text))
     return LLM().chat(
-        prompt=(
-            "Classify the following content into a JSON memory record.\n\n"
-            f"CONTENT: {raw_text!r}\n\n"
-            "Return a JSON object with these fields:\n"
-            "- kind ∈ {fact, preference, tool_outcome, scratchpad}.\n"
-            "- descriptor: one short human-readable line. MUST include any\n"
-            "  specific dates (e.g. '15 May 2026'), numbers, names, places,\n"
-            "  or other concrete entities present in the content — these are\n"
-            "  what later retrieval will key off. 'Mom's birthday is on 15\n"
-            "  May 2026' is a good descriptor; 'birthday and reminder\n"
-            "  schedule' is a bad descriptor.\n"
-            "- keywords: 3-8 lowercase search keywords pulled from the content.\n"
-            "- value: a dict with structured fields (entities, dates,\n"
-            "  attributes). MUST NOT be empty when the content has any\n"
-            "  identifiable entity — if you cannot classify a specific\n"
-            "  attribute, include {\"raw\": <the original content>}."
-        ),
+        prompt=prompt,
         auto_route="memory",
         provider="g",
         response_format={

@@ -1,0 +1,9 @@
+Classify the following content into a JSON memory record.
+
+CONTENT: {raw_text}
+
+Return a JSON object with these fields:
+- kind ∈ {fact, preference, tool_outcome, scratchpad}.
+- descriptor: one short human-readable line. MUST include any specific dates (e.g. '15 May 2026'), numbers, names, places, or other concrete entities present in the content — these are what later retrieval will key off. 'Mom's birthday is on 15 May 2026' is a good descriptor; 'birthday and reminder schedule' is a bad descriptor.
+- keywords: 3-8 lowercase search keywords pulled from the content.
+- value: a dict with structured fields (entities, dates, attributes). MUST NOT be empty when the content has any identifiable entity — if you cannot classify a specific attribute, include {"raw": <the original content>}.
