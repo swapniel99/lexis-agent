@@ -15,7 +15,7 @@ from datetime import datetime
 from typing import Literal
 from uuid import uuid4
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 def new_id(prefix: str = "id") -> str:
@@ -91,6 +91,14 @@ class DecisionOutput(BaseModel):
 
     answer: str | None = None
     tool_call: ToolCall | None = None
+
+    @model_validator(mode="after")
+    def _exactly_one(self) -> "DecisionOutput":
+        has_answer = self.answer is not None
+        has_tool = self.tool_call is not None
+        if has_answer == has_tool:  # both True or both False
+            raise ValueError("DecisionOutput requires exactly one of answer or tool_call")
+        return self
 
     @property
     def is_answer(self) -> bool:
