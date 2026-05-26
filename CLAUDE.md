@@ -24,13 +24,6 @@ bash run_query.sh f2 --no-clear   # keep prior state (required for cross-run que
 # Run all pre-defined queries in sequence
 bash run_all.sh
 
-# Run all tests
-uv run pytest
-
-# Run tests by marker
-uv run pytest -m network      # tests requiring internet
-uv run pytest -m embed        # tests requiring the gateway embed endpoint
-
 # Run MCP server standalone (stdio transport)
 uv run mcp_server.py
 
@@ -88,25 +81,29 @@ This is the load-bearing invariant of the architecture. Each role has exactly on
 
 ### Perception: orchestrator, not planner
 
-Perception's job is **what** needs to happen and **in what order**, expressed in intent language, never in tool names. It does not decide *how* — that belongs to Decision.
+Perception's job is **what** needs to happen and **in what order**, expressed in intent language, never in tool names. It does not decide *how* — that belongs to Decision. Runs at `temperature=1.0` (variety helps goal decomposition).
+
+**`_GoalDelta` and position-based identity**: The LLM emits `_GoalDelta` objects with no `id` field. Goals are matched to prior goals strictly by list position. The agent loop assigns stable `id` values from `prior_goals[i].id`. The LLM cannot drift or merge goal identity because identity is never exposed to it.
 
 **Goal stability rules** (implemented in `perception.py`):
 - Goals are identified by **position**.
 - **Sticky-done**: once a goal is marked done, it cannot be un-done in a later iteration. Implemented by carrying forward `prior_goals[i].done` and OR-ing with the LLM's proposal.
-- **Synthesis gate**: Synthesis/answer-type goals cannot be marked done unless there is an `answer` history entry which satisfies that particular goal.
-- **Discovery-time expansion**: when a discovery action (e.g. `list_dir`) reveals concrete items that weren't knowable at decomposition time, Perception may **append** add goals after the existing done goals but before the final synthesis goal. Duplicates of prior goal texts are filtered out.
+- **Synthesis gate**: Synthesis/answer-type goals cannot be marked done unless there is an `answer` history entry for that `goal_id` with `len(text) > 60`. Keywords that trigger this gate: `evaluate`, `select`, `synthes`, `compare`, `decide`, `recommend`, `tell me which`, `most appropriate`, `analy`, `pick`, `choose`, `summarise`, `summarize`, `answer`, `identify`, `find`, `determine`, `extract`, `list`, `report`, `tell`, `explain`, `describe`, `name`.
+- **Discovery-time expansion**: when a discovery action (e.g. `list_dir`) reveals concrete items that weren't knowable at decomposition time, Perception may **append** goals after the existing ones. Duplicates of prior goal texts are filtered out.
 
-**Artifact attachment** is Perception's exclusive job. Perception signals `send_artifact: true` and an `artifact_index` pointing at a memory-hit slot. The agent loop resolves this to bytes and passes them to Decision. Decision never decides which artifact to attach — it only consumes what Perception chose.
+**Artifact attachment** is Perception's exclusive job. Perception signals `send_artifact: true` and an `artifact_index` pointing at a memory-hit slot. The outer loop resolves this: `artifacts.get_bytes(goal.attach_artifact_id)` → `attached: list[tuple[str, bytes]]` → passed to `decision.next_step()`. Decision never decides which artifact to attach — it only reads what Perception chose.
+
+**Force-attach safety net** (`perception.py:186-195`): if the first unfinished goal matches a synthesis keyword AND artifacts exist in memory hits AND the model forgot `send_artifact`, Perception force-attaches the most recent artifact. This guards against `temperature=1.0` unreliability on artifact signaling.
 
 ### Decision: tool-selector, not orchestrator
 
-Decision sees exactly **one goal at a time**. It has no visibility into other goals or into the full goal list. Its only question: given this goal, this memory context, and these available tools — should I call a tool or emit an answer?
+Decision sees exactly **one goal at a time**. It has no visibility into other goals or into the full goal list. Its only question: given this goal, this memory context, and these available tools — should I call a tool or emit an answer? Runs at `temperature=0` (deterministic tool selection).
 
-Decision is the only layer that sees MCP tool names. The tool catalogue is passed as `mcp_tools` from the agent loop; Decision's SYSTEM prompt may contain tool-selection guidance but cannot reference specific tools by name. It should pick the tool based on the goal and the memory hits.
+Decision is the only layer that sees MCP tool names. The tool catalogue (`mcp_tools`) is passed from the agent loop as structured dicts with `name`, `description`, and `input_schema`. Decision picks the tool based on the goal and memory hits — the tool docstrings guide selection, not the SYSTEM prompt.
 
-> **TODO**: `decision.py`'s current SYSTEM string names specific tools (`index_document`, `search_knowledge`, `read_file`, etc.). This violates the intent above. That guidance belongs in the MCP tool docstrings, not in the SYSTEM prompt. Migrate progressively — move each rule into the relevant tool's docstring, then remove it from SYSTEM.
+> **Known violation** (`decision.py:SYSTEM`): the current SYSTEM string names specific MCP tools by name (`index_document`, `search_knowledge`, `read_file`, `create_file`, etc.). This violates the design intent. Tool-selection guidance belongs in MCP tool docstrings, not in SYSTEM. Migrate progressively: move each rule into the relevant tool's docstring in `mcp_server.py`, then remove it from SYSTEM.
 
-Decision emits exactly one of two things: a `ToolCall` or a plain-text answer. Never both. `DecisionOutput` enforces this at the schema level.
+Decision emits exactly one of two things: a `ToolCall` or a plain-text answer. Never both. `DecisionOutput` enforces this via `@model_validator` — raises `ValueError` if both or neither are set.
 
 ### Action: pure executor
 
@@ -160,3 +157,7 @@ grep -n "index_document\|search_knowledge\|web_search\|fetch_url" perception.py
 ## Test corpus
 
 Research papers live in `sandbox/papers/`: `attention.md`, `cot.md`, `dpo.md`, `lora.md`, `react.md`. These are the corpus for the Session 7 RAG queries.
+
+## Query plan
+
+`docs/PLAN.md` is the authoritative source for all 8 required queries (A–H) and their exit criteria. Steps 9–16 map 1:1 to queries A–H. Steps 17–19 cover the open-corpus RAG application. Each step has iteration-count ceilings (expressed as 2× observed) and specific output requirements. When a query fails, check the PLAN.md exit criteria first before debugging the agent loop.

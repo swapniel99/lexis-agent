@@ -11,7 +11,7 @@ search. Items of kind `scratchpad` are run-scoped and skip embedding.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Literal
 from uuid import uuid4
 
@@ -44,7 +44,7 @@ class MemoryItem(BaseModel):
     run_id: str
     goal_id: str | None = None
     confidence: float = 1.0
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 # ── Artifacts ───────────────────────────────────────────────────────────────
@@ -55,7 +55,7 @@ class Artifact(BaseModel):
     size_bytes: int
     source: str
     descriptor: str
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 # ── Goals & Observations ────────────────────────────────────────────────────

@@ -94,8 +94,8 @@ Verify orchestration invariants.
 
 **Exit:**
 - Goal "fetch wikipedia page for X", no attachment → `DecisionOutput` with `tool_call.name == "fetch_url"`.
-- Goal "extract dates from this article" with artifact bytes attached → `DecisionOutput` with `answer`, ≥3 sentences, no tool call.
-- Goal with indexed corpus in memory hits → `tool_call.name == "search_knowledge"` (not re-fetch).
+- Goal "extract dates from this article" with artifact bytes attached → `DecisionOutput` with `answer`, no tool call. Answer must be substantive: ≥3 sentences, or ≥3 list items, or ≥3 inline enumerated entries (e.g. comma-separated with annotations).
+- Goal with indexed corpus in memory hits → either `tool_call.name == "search_knowledge"` OR a direct answer synthesised from chunk previews already in memory hits. Must NOT call `fetch_url`, `web_search`, or `read_file` (no re-fetch of already-indexed content).
 - Exactly one of `answer`/`tool_call` populated every call.
 
 ---
