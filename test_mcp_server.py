@@ -8,7 +8,12 @@ import sys
 from pathlib import Path
 
 import pytest
-import pytest_asyncio
+
+
+@pytest.fixture
+def anyio_backend():
+    return "asyncio"
+
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
@@ -40,7 +45,7 @@ def _clean_sandbox() -> None:
     SANDBOX.mkdir()
 
 
-@pytest_asyncio.fixture(scope="session", loop_scope="session")
+@pytest.fixture
 async def session():
     params = StdioServerParameters(command=sys.executable, args=[str(SERVER)])
     async with stdio_client(params) as (read, write):
@@ -50,7 +55,7 @@ async def session():
 
 
 @pytest.mark.network
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_web_search(session):
     res = await session.call_tool("web_search", {"query": "python asyncio", "max_results": 3})
     data = _result(res)
@@ -62,7 +67,7 @@ async def test_web_search(session):
 
 
 @pytest.mark.network
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_fetch_url(session):
     res = await session.call_tool("fetch_url", {"url": "https://example.com"})
     data = _result(res)
@@ -73,7 +78,7 @@ async def test_fetch_url(session):
     assert "text" in data["content_type"].lower() or "html" in data["content_type"].lower()
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_get_time(session):
     res = await session.call_tool("get_time", {"timezone": "Asia/Kolkata"})
     data = _result(res)
@@ -85,7 +90,7 @@ async def test_get_time(session):
 
 
 @pytest.mark.network
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_currency_convert(session):
     res = await session.call_tool(
         "currency_convert", {"amount": 100, "from_currency": "usd", "to_currency": "eur"}
@@ -100,7 +105,7 @@ async def test_currency_convert(session):
     assert data["rate"] > 0
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_read_file(session):
     _clean_sandbox()
     (SANDBOX / "hello.txt").write_text("hello world", encoding="utf-8")
@@ -113,7 +118,7 @@ async def test_read_file(session):
     assert data["path"] == "hello.txt"
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_list_dir(session):
     _clean_sandbox()
     (SANDBOX / "a.txt").write_text("a", encoding="utf-8")
@@ -121,15 +126,17 @@ async def test_list_dir(session):
     res = await session.call_tool("list_dir", {"path": "."})
     data = _result(res)
     print("list_dir:", data)
-    assert isinstance(data, list)
-    names = {e["name"]: e for e in data}
+    assert isinstance(data, dict)
+    entries = data["entries"]
+    assert isinstance(entries, list)
+    names = {e["name"]: e for e in entries}
     assert names["a.txt"]["type"] == "file"
     assert names["a.txt"]["size_bytes"] == 1
     assert names["sub"]["type"] == "dir"
     assert names["sub"]["size_bytes"] == 0
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_create_file(session):
     _clean_sandbox()
     res = await session.call_tool("create_file", {"path": "new.txt", "content": "fresh"})
@@ -144,7 +151,7 @@ async def test_create_file(session):
     print("create_file dup error:", dup.content[0].text if dup.content else "")
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_update_file(session):
     _clean_sandbox()
     (SANDBOX / "u.txt").write_text("old", encoding="utf-8")
@@ -160,7 +167,7 @@ async def test_update_file(session):
     print("update_file missing error:", missing.content[0].text if missing.content else "")
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_edit_file(session):
     _clean_sandbox()
     (SANDBOX / "e.txt").write_text("foo bar foo", encoding="utf-8")
@@ -195,7 +202,7 @@ async def test_edit_file(session):
     print("edit_file not-found error:", missing.content[0].text if missing.content else "")
 
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_sandbox_escape(session):
     res = await session.call_tool("read_file", {"path": "../foo"})
     assert res.isError, "sandbox escape must be rejected"
