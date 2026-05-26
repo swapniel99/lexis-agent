@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 EAGV3 Session 7 agent — a four-role cognitive architecture (Perception → Decision → Action → Memory) extended with FAISS-backed vector retrieval and document indexing. Built on top of a separately-running LLM gateway (llm_gatewayV7, expected at `../llm_gatewayV7`).
 
+Session 7 is **incremental over Session 6**. The four roles, Pydantic contracts, agent loop, and MCP tools are unchanged from S6. S7 adds: one `embedding` field on `MemoryItem`, FAISS vector search in the Memory read path, `vector_index.py`, and two new MCP tools (`index_document`, `search_knowledge`). Architecture specs and query traces for the S6 baseline (queries A–D) live in `docs/session6-notes.md`. S7-specific additions and queries E–H live in `docs/session7-notes.md`.
+
 ## Commands
 
 ```bash
