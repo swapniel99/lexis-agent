@@ -40,6 +40,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from fastapi import Request
+
+@app.middleware("http")
+async def add_no_cache_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
+
 DOCS_DIR = Path(__file__).parent / "sandbox" / "real_documents"
 STATE_DIR = Path(__file__).parent / "state"
 
@@ -173,27 +183,30 @@ def get_memory_state():
 
 
 @app.post("/api/clear")
-def clear_all_state():
-    """Wipe memories, FAISS indexes, artifacts, and temporary sandbox text files clean."""
+def clear_session_state():
+    """Wipe session memories (preferences, queries, outcomes), artifacts, and temporary text files, keeping indexed facts intact."""
     try:
-        # 1. Clear memory JSON and FAISS indexes via memory.py
-        _memory.clear()
+        # 1. Load memory items and keep ONLY 'fact' items (the indexed documents)
+        items = _memory._load()
+        fact_items = [i for i in items if i.kind == "fact"]
+        _memory._save(fact_items)
         
-        # 2. Delete state artifacts directory recursively
+        # 2. Rebuild the FAISS index to exclude any deleted outcome/preference vectors
+        idx = VectorIndex(STATE_DIR)
+        idx.clear()
+        for item in fact_items:
+            if item.embedding is not None:
+                idx.add(item.id, item.embedding)
+        if idx.size > 0:
+            idx.persist()
+            
+        # 3. Delete state artifacts directory recursively (wipes session files)
         artifacts_dir = STATE_DIR / "artifacts"
         if artifacts_dir.exists():
             import shutil
             shutil.rmtree(artifacts_dir)
             artifacts_dir.mkdir(exist_ok=True)
             
-        # 3. Delete any general JSON files left in state directory (like any temp logs)
-        for child in STATE_DIR.iterdir():
-            if child.suffix == ".json" and child.name not in ("memory.json", "index_ids.json"):
-                try:
-                    child.unlink()
-                except Exception:
-                    pass
-                    
         # 4. Clear any temporary .txt files in the sandbox directory
         sandbox_dir = Path(__file__).parent / "sandbox"
         if sandbox_dir.exists():
@@ -204,7 +217,17 @@ def clear_all_state():
                     except Exception:
                         pass
                         
-        return {"ok": True, "message": "Global state completely wiped (FAISS index, memory.json, artifacts, and sandbox .txt files)"}
+        return {"ok": True, "message": "Session state wiped clean (indexed legal documents preserved, active conversation cleared)"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/api/clear-faiss")
+def clear_faiss_index():
+    """Completely wipe the FAISS vector index and remove all indexed facts from memory."""
+    try:
+        _memory.clear()
+        return {"ok": True, "message": "FAISS vector index and all indexed facts wiped clean"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

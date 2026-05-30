@@ -38,8 +38,8 @@ body {
     font-family: 'Outfit', sans-serif;
     background-color: var(--bg-dark);
     color: var(--text-primary);
-    overflow-x: hidden;
-    min-height: 100vh;
+    overflow: hidden;
+    height: 100vh;
     display: flex;
     flex-direction: column;
 }
@@ -81,23 +81,24 @@ body {
     100% { transform: scale(1.3) translate(-80px, 50px); }
 }
 
-/* ── HUD CONTAINER & HEADER ──────────────────────────────────────────────── */
 .hud-container {
     width: 100%;
     max-width: 1600px;
     margin: 0 auto;
-    padding: 1.5rem;
-    flex-grow: 1;
+    padding: 1rem;
+    height: 100%;
+    max-height: 100%;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1rem;
+    box-sizing: border-box;
 }
 
 .hud-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.2rem 2rem;
+    padding: 0.5rem 1.5rem;
     background: rgba(13, 23, 47, 0.5);
     border: 1px solid var(--panel-border);
     border-radius: var(--radius-lg);
@@ -108,41 +109,41 @@ body {
 .header-logo {
     display: flex;
     align-items: center;
-    gap: 1.2rem;
+    gap: 0.8rem;
 }
 
 .logo-glow {
-    font-size: 2.5rem;
+    font-size: 1.8rem;
     color: var(--color-gold);
-    text-shadow: 0 0 15px rgba(212, 175, 55, 0.6);
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
     animation: floatLogo 4s ease-in-out infinite;
 }
 
 @keyframes floatLogo {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
+    50% { transform: translateY(-3px); }
 }
 
 .logo-text h1 {
-    font-size: 1.6rem;
+    font-size: 1.25rem;
     font-weight: 700;
-    letter-spacing: 2px;
+    letter-spacing: 1.5px;
     background: linear-gradient(135deg, #ffffff 0%, var(--color-gold) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
 .logo-text .sub-text {
-    font-size: 0.65rem;
+    font-size: 0.55rem;
     font-weight: 500;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
     color: var(--text-muted);
     display: block;
 }
 
 .header-metrics {
     display: flex;
-    gap: 2rem;
+    gap: 1.5rem;
     align-items: center;
 }
 
@@ -153,24 +154,25 @@ body {
 }
 
 .metric-item .label {
-    font-size: 0.55rem;
-    letter-spacing: 2px;
+    font-size: 0.5rem;
+    letter-spacing: 1.5px;
     color: var(--text-muted);
-    margin-bottom: 2px;
+    margin-bottom: 1px;
 }
 
 .metric-item .value {
     font-family: 'Share Tech Mono', monospace;
-    font-size: 1rem;
+    font-size: 0.85rem;
     font-weight: 600;
 }
 
 .status-indicator {
+    display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     background: rgba(16, 185, 129, 0.1);
-    padding: 6px 12px;
+    padding: 4px 10px;
     border-radius: 20px;
     border: 1px solid rgba(16, 185, 129, 0.2);
 }
@@ -196,15 +198,18 @@ body {
 /* ── LAYOUT GRID & PANEL STRUCTURE ───────────────────────────────────────── */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: 1.3fr 0.7fr;
+    grid-template-columns: 1.5fr 0.5fr;
     gap: 1.5rem;
     flex-grow: 1;
+    min-height: 0;
 }
 
 .panel {
     display: flex;
     flex-direction: column;
-    height: 780px; /* fixed comfortable height */
+    height: 100%;
+    min-height: 0;
+    min-width: 0;
 }
 
 .glass-card {
@@ -460,6 +465,7 @@ body {
 /* ── RIGHT PANEL: TABS & CONTENT ─────────────────────────────────────────── */
 .panel-tabs {
     display: flex;
+    flex-shrink: 0;
     background: rgba(13, 23, 47, 0.3);
     border-bottom: 1px solid rgba(212, 175, 55, 0.15);
     border-top-left-radius: var(--radius-lg);
@@ -469,11 +475,11 @@ body {
 
 .tab-btn {
     flex-grow: 1;
-    padding: 1.1rem;
+    padding: 0.8rem 0.5rem;
     font-family: 'Outfit', sans-serif;
     font-weight: 600;
-    font-size: 0.9rem;
-    letter-spacing: 1px;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
     background: transparent;
     color: var(--text-muted);
     border: none;
@@ -482,8 +488,9 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
     border-bottom: 2px solid transparent;
+    white-space: nowrap;
 }
 
 .tab-btn:hover {
@@ -508,20 +515,37 @@ body {
 .tab-content {
     display: none;
     flex-direction: column;
+    flex-grow: 1;
     height: 100%;
+    min-height: 0;
     overflow: hidden;
 }
 
 .tab-content.active {
     display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
 
-/* ── TAB 1: LIBRARY CORPUS ───────────────────────────────────────────────── */
 .library-toolbar {
     display: flex;
-    gap: 1rem;
+    flex-direction: column;
+    gap: 0.8rem;
     margin-bottom: 1.2rem;
-    align-items: center;
+}
+
+.toolbar-buttons {
+    display: flex;
+    gap: 0.6rem;
+    width: 100%;
+}
+
+.toolbar-buttons .btn {
+    flex-grow: 1;
+    flex-basis: 0;
+    padding: 0.5rem 0.4rem;
+    font-size: 0.72rem;
+    white-space: nowrap;
 }
 
 .search-box {
@@ -589,8 +613,10 @@ body {
     background: rgba(15, 23, 42, 0.35);
     border: 1px solid rgba(226, 232, 240, 0.05);
     border-radius: var(--radius-sm);
-    padding: 10px 16px;
+    padding: 10px 12px;
     transition: var(--transition-smooth);
+    min-width: 0;
+    gap: 8px;
 }
 
 .doc-card:hover {
@@ -601,22 +627,22 @@ body {
 .doc-info {
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 4px;
     overflow: hidden;
-    max-width: 75%;
+    flex-grow: 1;
+    min-width: 0;
 }
 
 .doc-title {
-    font-size: 0.85rem;
+    font-size: 0.76rem;
     font-weight: 500;
     color: var(--text-primary);
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
+    line-height: 1.35;
+    word-break: break-word;
 }
 
 .doc-meta {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: var(--text-muted);
     font-family: 'Share Tech Mono', monospace;
     display: flex;
@@ -633,7 +659,8 @@ body {
 
 .doc-actions {
     display: flex;
-    gap: 8px;
+    gap: 6px;
+    flex-shrink: 0;
 }
 
 .btn-icon {
@@ -892,4 +919,86 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(212, 175, 55, 0.35);
+}
+
+/* ── EXECUTIVE RESOLUTION CARD & TABLES Rendering ────────────────────────── */
+.resolution-card {
+    background: rgba(212, 175, 55, 0.06);
+    border: 1px solid var(--panel-border-hover);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+    font-family: 'Outfit', sans-serif; /* Switch final answer to Outfit for extreme readability! */
+    font-size: 0.92rem;
+    color: var(--text-primary);
+    line-height: 1.6;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    text-align: left;
+}
+
+.resolution-title {
+    color: var(--color-gold);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    padding-bottom: 0.5rem;
+}
+
+.resolution-card p {
+    margin-bottom: 1rem;
+}
+
+.resolution-card strong {
+    color: var(--color-gold);
+}
+
+.resolution-card ul {
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+    list-style-type: square;
+}
+
+.resolution-card li {
+    margin-bottom: 0.5rem;
+}
+
+/* Slick Gold Table Rendering */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin: 1.2rem 0;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--panel-border);
+    background: rgba(7, 11, 25, 0.6);
+}
+
+.hud-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.85rem;
+    text-align: left;
+}
+
+.hud-table th {
+    background: rgba(212, 175, 55, 0.15);
+    color: var(--color-gold);
+    padding: 10px 14px;
+    font-weight: 600;
+    border-bottom: 2px solid var(--panel-border-hover);
+}
+
+.hud-table td {
+    padding: 10px 14px;
+    color: var(--text-primary);
+    border-bottom: 1px solid rgba(226, 232, 240, 0.05);
+}
+
+.hud-table tr:hover {
+    background: rgba(212, 175, 55, 0.03);
 }

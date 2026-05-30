@@ -55,7 +55,7 @@
                 <div class="panel-header">
                     <h2><i class="fa-solid fa-terminal text-gold"></i> LEGAL DISPATCH & EXECUTION</h2>
                     <div class="actions">
-                        <button class="btn btn-sm btn-danger" id="btn-clear" title="Clear FAISS Index and memories">
+                        <button class="btn btn-sm btn-danger" id="btn-clear" title="Wipe session conversation, memories and preferences but preserve indexed legal documents">
                             <i class="fa-solid fa-trash-can"></i> WIPE STATE
                         </button>
                     </div>
@@ -113,10 +113,10 @@
             <section class="panel right-panel glass-card">
                 <div class="panel-tabs">
                     <button class="tab-btn active" data-tab="library">
-                        <i class="fa-solid fa-book-bookmark"></i> INDIAN LEGAL CORPUS
+                        <i class="fa-solid fa-book-bookmark"></i> LEGAL CORPUS
                     </button>
                     <button class="tab-btn" data-tab="faiss-map">
-                        <i class="fa-solid fa-circle-nodes"></i> FAISS VECTOR MEMORY MAP
+                        <i class="fa-solid fa-circle-nodes"></i> FAISS MEMORY
                     </button>
                 </div>
 
@@ -128,9 +128,14 @@
                                 <i class="fa-solid fa-filter"></i>
                                 <input type="text" id="library-search" placeholder="Filter by title, citation, or laws...">
                             </div>
-                            <button class="btn btn-gold" id="btn-index-all">
-                                <i class="fa-solid fa-bolt"></i> INDEX ALL 50 DOCS
-                            </button>
+                            <div class="toolbar-buttons">
+                                <button class="btn btn-gold" id="btn-index-all">
+                                    <i class="fa-solid fa-bolt"></i> INDEX ALL 50 DOCS
+                                </button>
+                                <button class="btn btn-danger" id="btn-clear-faiss" title="Wipe FAISS vector store index and remove all indexed document facts completely">
+                                    <i class="fa-solid fa-trash-can"></i> WIPE INDEX
+                                </button>
+                            </div>
                         </div>
 
                         <!-- Documents Split Category Grid -->
