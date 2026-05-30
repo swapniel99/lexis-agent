@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEXIS-RAG: Indian Corporate & Real Estate Legal Intelligence Command Center</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Style -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="stars-bg"></div>
+    <div class="nebula-bg"></div>
+
+    <div class="hud-container">
+        <!-- ── HUD HEADER ────────────────────────────────────────────────── -->
+        <header class="hud-header">
+            <div class="header-logo">
+                <i class="fa-solid fa-scale-balanced logo-glow"></i>
+                <div class="logo-text">
+                    <h1>LEXIS-RAG</h1>
+                    <span class="sub-text">INDIAN LEGAL INTELLIGENCE COMMAND</span>
+                </div>
+            </div>
+            <div class="header-metrics">
+                <div class="metric-item">
+                    <span class="label">EMBEDDING MODEL</span>
+                    <span class="value cyan-glow" id="embed-model">NOMIC-MOE-V2</span>
+                </div>
+                <div class="metric-item">
+                    <span class="label">CORPUS LIBRARY</span>
+                    <span class="value" id="corpus-count">50 DOCUMENTS</span>
+                </div>
+                <div class="metric-item">
+                    <span class="label">FAISS MEMORY</span>
+                    <span class="value gold-glow" id="faiss-vectors">0 VECTORS</span>
+                </div>
+                <div class="metric-item status-indicator">
+                    <span class="dot pulse-green"></span>
+                    <span class="value green-glow">ONLINE</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- ── MAIN DASHBOARD LAYOUT ──────────────────────────────────────── -->
+        <main class="dashboard-grid">
+            
+            <!-- LEFT PANEL: Query Console & Live Terminal -->
+            <section class="panel left-panel glass-card">
+                <div class="panel-header">
+                    <h2><i class="fa-solid fa-terminal text-gold"></i> LEGAL DISPATCH & EXECUTION</h2>
+                    <div class="actions">
+                        <button class="btn btn-sm btn-danger" id="btn-clear" title="Clear FAISS Index and memories">
+                            <i class="fa-solid fa-trash-can"></i> WIPE STATE
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="console-body">
+                    <!-- Query Input Area -->
+                    <div class="query-area">
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-search input-icon text-gold"></i>
+                            <input type="text" id="query-input" placeholder="Query Indian corporate laws, RERA cases, Supreme Court decisions..." autofocus autocomplete="off">
+                            <button id="btn-submit" class="btn btn-primary">
+                                <span class="btn-text">DISPATCH</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Suggestion Chips -->
+                        <div class="suggestion-chips">
+                            <span class="chip" data-query="What did the Supreme Court of India rule in Swiss Ribbons regarding the constitutional validity of IBC 2016?">
+                                Swiss Ribbons (IBC Validity)
+                            </span>
+                            <span class="chip" data-query="Are flat buyers considered financial creditors or operational creditors in real estate insolvencies under Indian law?">
+                                Home Buyers as Creditors
+                            </span>
+                            <span class="chip" data-query="What were the primary reasons for the demolition of the Supertech Twin Towers in Noida?">
+                                Supertech Demolition
+                            </span>
+                            <span class="chip" data-query="Compare how secured and unsecured creditors are treated under the Essar Steel judgment of the Supreme Court.">
+                                Essar Steel (Secured Creditors)
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Live Agent Terminal Screen -->
+                    <div class="terminal-container">
+                        <div class="terminal-header">
+                            <div class="terminal-dots">
+                                <span class="dot red"></span>
+                                <span class="dot yellow"></span>
+                                <span class="dot green"></span>
+                            </div>
+                            <span class="terminal-title">AGENT_COGNITIVE_LOOP_LOGS.EXE</span>
+                            <span class="terminal-clear" id="btn-clear-terminal" title="Clear Screen"><i class="fa-solid fa-ban"></i></span>
+                        </div>
+                        <div class="terminal-screen" id="terminal-screen">
+                            <div class="terminal-line system-line">> System initialized. Indian Legal Intelligence Center ready for dispatch.</div>
+                            <div class="terminal-line system-line">> Enter custom legal query or click a preset chip above to observe agent RAG loop.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RIGHT PANEL: Library & Vector Map -->
+            <section class="panel right-panel glass-card">
+                <div class="panel-tabs">
+                    <button class="tab-btn active" data-tab="library">
+                        <i class="fa-solid fa-book-bookmark"></i> INDIAN LEGAL CORPUS
+                    </button>
+                    <button class="tab-btn" data-tab="faiss-map">
+                        <i class="fa-solid fa-circle-nodes"></i> FAISS VECTOR MEMORY MAP
+                    </button>
+                </div>
+
+                <div class="panel-body">
+                    <!-- Tab Content 1: Indian Legal Corpus -->
+                    <div class="tab-content active" id="tab-library">
+                        <div class="library-toolbar">
+                            <div class="search-box">
+                                <i class="fa-solid fa-filter"></i>
+                                <input type="text" id="library-search" placeholder="Filter by title, citation, or laws...">
+                            </div>
+                            <button class="btn btn-gold" id="btn-index-all">
+                                <i class="fa-solid fa-bolt"></i> INDEX ALL 50 DOCS
+                            </button>
+                        </div>
+
+                        <!-- Documents Split Category Grid -->
+                        <div class="library-container">
+                            <div class="category-block">
+                                <h3 class="category-title text-cyan"><i class="fa-solid fa-building-columns"></i> Corporate & Insolvency Law (25 Documents)</h3>
+                                <div class="docs-list" id="corp-docs-list">
+                                    <div class="loader-spinner"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading Corporate laws...</div>
+                                </div>
+                            </div>
+                            <div class="category-block">
+                                <h3 class="category-title text-gold"><i class="fa-solid fa-house-chimney-window"></i> Real Estate & Property Law (25 Documents)</h3>
+                                <div class="docs-list" id="re-docs-list">
+                                    <div class="loader-spinner"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading Property laws...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Content 2: FAISS Vector Memory Map -->
+                    <div class="tab-content" id="tab-faiss-map">
+                        <div class="vector-map-header">
+                            <div class="search-box">
+                                <i class="fa-solid fa-search"></i>
+                                <input type="text" id="memory-search" placeholder="Search facts in vector memory...">
+                            </div>
+                            <div class="vectors-stat text-gold" id="vectors-stat-lbl">
+                                0 / 0 vectors loaded
+                            </div>
+                        </div>
+                        
+                        <div class="vector-grid-container">
+                            <!-- Visual Vector List Grid -->
+                            <div class="vector-grid" id="vector-grid">
+                                <div class="no-vectors-placeholder">
+                                    <i class="fa-solid fa-database"></i>
+                                    <p>No vectors in FAISS memory yet.</p>
+                                    <p>Index documents from the "INDIAN LEGAL CORPUS" tab or run queries with URLs to populate!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ── DETAIL VIEW MODAL (For reading document text) ──────────────── -->
+    <div class="modal" id="doc-modal">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h3 id="modal-title">Landmark Case Brief</h3>
+                <span class="modal-close" id="modal-close"><i class="fa-solid fa-xmark"></i></span>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Rich markdown compiled content goes here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Script imports -->
+    <script src="app.js"></script>
+</body>
+</html>
