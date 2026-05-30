@@ -1,6 +1,6 @@
 """app.py
 
-FastAPI backend server for LEXIS-RAG: Indian Corporate & Real Estate Legal Intelligence Command Center.
+FastAPI backend server for LEXIS-RAG: Indian Corporate & Real Estate Legal Intelligence.
 Integrates S7 agent loop, live console log streaming (SSE), legal corpus management, and FAISS indexing.
 """
 
@@ -77,7 +77,7 @@ def get_documents():
     """List all 50 real Indian legal documents in the sandbox."""
     if not DOCS_DIR.exists():
         return {"documents": [], "count": 0}
-    
+
     docs = []
     for child in sorted(DOCS_DIR.iterdir()):
         if child.suffix == ".md":
@@ -85,7 +85,7 @@ def get_documents():
             category = "Corporate & Insolvency Law" if child.name.startswith("corp_") else "Real Estate & Property Law"
             # Get ID
             doc_id = child.name.split("_")[0] + "_" + child.name.split("_")[1] if "_" in child.name else child.stem
-            
+
             docs.append({
                 "filename": child.name,
                 "id": doc_id,
@@ -103,10 +103,10 @@ def get_document(filename: str):
     base_dir = DOCS_DIR.resolve()
     if base_dir not in safe_path.parents and safe_path != base_dir:
         raise HTTPException(status_code=400, detail="Invalid path escape attempt")
-    
+
     if not safe_path.exists():
         raise HTTPException(status_code=404, detail="Document not found")
-        
+
     return {
         "filename": filename,
         "title": _get_doc_title(safe_path),
@@ -124,7 +124,7 @@ def index_document(payload: IndexRequest):
             # Ensure it resolves in sandbox
             relative_path = Path("real_documents") / Path(doc_path).name
             doc_path = str(relative_path)
-            
+
         result = _mcp_server.index_document(doc_path)
         return {"ok": True, "result": result}
     except Exception as e:
@@ -136,7 +136,7 @@ def index_all_documents(background_tasks: BackgroundTasks):
     """Trigger background indexing of all 50 documents for first-time RAG setup."""
     if not DOCS_DIR.exists():
         raise HTTPException(status_code=404, detail="No documents directory found")
-    
+
     def _run_bulk_indexing():
         for child in sorted(DOCS_DIR.iterdir()):
             if child.suffix == ".md":
@@ -145,7 +145,7 @@ def index_all_documents(background_tasks: BackgroundTasks):
                     _mcp_server.index_document(rel_path)
                 except Exception as e:
                     print(f"[Bulk Indexing] Error indexing {child.name}: {e}")
-                    
+
     background_tasks.add_task(_run_bulk_indexing)
     return {"ok": True, "message": "Bulk indexing of all 50 documents started in the background"}
 
@@ -156,11 +156,11 @@ def get_memory_state():
     memory_file = STATE_DIR / "memory.json"
     if not memory_file.exists():
         return {"items": [], "count": 0, "vectors_count": 0}
-        
+
     try:
         items = json.loads(memory_file.read_text(encoding="utf-8"))
         idx = VectorIndex(STATE_DIR)
-        
+
         # Strip large embeddings for light payload
         cleaned_items = []
         for it in items:
@@ -172,7 +172,7 @@ def get_memory_state():
                 "run_id": it.get("run_id"),
                 "value": {k: v for k, v in it.get("value", {}).items() if k != "chunk"}
             })
-            
+
         return {
             "items": cleaned_items,
             "count": len(cleaned_items),
@@ -190,7 +190,7 @@ def clear_session_state():
         items = _memory._load()
         fact_items = [i for i in items if i.kind == "fact"]
         _memory._save(fact_items)
-        
+
         # 2. Rebuild the FAISS index to exclude any deleted outcome/preference vectors
         idx = VectorIndex(STATE_DIR)
         idx.clear()
@@ -199,14 +199,14 @@ def clear_session_state():
                 idx.add(item.id, item.embedding)
         if idx.size > 0:
             idx.persist()
-            
+
         # 3. Delete state artifacts directory recursively (wipes session files)
         artifacts_dir = STATE_DIR / "artifacts"
         if artifacts_dir.exists():
             import shutil
             shutil.rmtree(artifacts_dir)
             artifacts_dir.mkdir(exist_ok=True)
-            
+
         # 4. Clear any temporary .txt files in the sandbox directory
         sandbox_dir = Path(__file__).parent / "sandbox"
         if sandbox_dir.exists():
@@ -216,7 +216,7 @@ def clear_session_state():
                         child.unlink()
                     except Exception:
                         pass
-                        
+
         return {"ok": True, "message": "Session state wiped clean (indexed legal documents preserved, active conversation cleared)"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -244,7 +244,7 @@ async def run_agent_query(payload: QueryRequest):
     async def _event_generator():
         # Spawn agent7.py as an external process with -u for unbuffered live streaming
         cmd = [sys.executable, "-u", "agent7.py", query_str]
-        
+
         try:
             process = await asyncio.create_subprocess_exec(
                 *cmd,
@@ -252,21 +252,21 @@ async def run_agent_query(payload: QueryRequest):
                 stderr=asyncio.subprocess.STDOUT,
                 cwd=str(Path(__file__).parent)
             )
-            
+
             # Read stdout line-by-line and yield it
             while True:
                 line_bytes = await process.stdout.readline()
                 if not line_bytes:
                     break
                 line = line_bytes.decode("utf-8", errors="replace")
-                
+
                 # Check for final answers or markers to enrich payload
                 yield f"data: {json.dumps({'type': 'log', 'text': line})}\n\n"
                 await asyncio.sleep(0.01)  # small breathing room
-                
+
             await process.wait()
             yield f"data: {json.dumps({'type': 'done', 'code': process.returncode})}\n\n"
-            
+
         except Exception as err:
             yield f"data: {json.dumps({'type': 'error', 'text': str(err)})}\n\n"
 

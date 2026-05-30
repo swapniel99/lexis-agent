@@ -1,4 +1,4 @@
-# LEXIS-RAG: Indian Corporate & Real Estate Legal Intelligence Command Center
+# LEXIS-RAG: Indian Corporate & Real Estate Legal Intelligence
 
 LEXIS-RAG is a professional, high-stakes RAG (Retrieval-Augmented Generation) application designed for lawyers, law students, and real estate developers. It utilizes the robust **Session 7 four-role cognitive architecture** (Perception → Decision → Action → Memory) coupled with a **FAISS vector database** to index and query landmark judgments under Indian corporate, securities, and property laws.
 

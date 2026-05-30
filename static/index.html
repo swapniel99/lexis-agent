@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LEXIS-RAG: Indian Corporate & Real Estate Legal Intelligence Command Center</title>
+    <title>LEXIS-RAG: Indian Corporate & Real Estate Legal Intelligence</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=Share+Tech+Mono&display=swap"
+        rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Main Style -->
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div class="stars-bg"></div>
     <div class="nebula-bg"></div>
@@ -49,42 +53,49 @@
 
         <!-- ── MAIN DASHBOARD LAYOUT ──────────────────────────────────────── -->
         <main class="dashboard-grid">
-            
+
             <!-- LEFT PANEL: Query Console & Live Terminal -->
             <section class="panel left-panel glass-card">
                 <div class="panel-header">
                     <h2><i class="fa-solid fa-terminal text-gold"></i> LEGAL DISPATCH & EXECUTION</h2>
                     <div class="actions">
-                        <button class="btn btn-sm btn-danger" id="btn-clear" title="Wipe session conversation, memories and preferences but preserve indexed legal documents">
+                        <button class="btn btn-sm btn-danger" id="btn-clear"
+                            title="Wipe session conversation, memories and preferences but preserve indexed legal documents">
                             <i class="fa-solid fa-trash-can"></i> WIPE STATE
                         </button>
                     </div>
                 </div>
-                
+
                 <div class="console-body">
                     <!-- Query Input Area -->
                     <div class="query-area">
                         <div class="input-wrapper">
                             <i class="fa-solid fa-search input-icon text-gold"></i>
-                            <textarea id="query-input" placeholder="Query Indian corporate laws, RERA cases, Supreme Court decisions (e.g. paste a complex query or legal URL here)..." autofocus autocomplete="off" rows="3"></textarea>
+                            <textarea id="query-input"
+                                placeholder="Query Indian corporate laws, RERA cases, Supreme Court decisions (e.g. paste a complex query or legal URL here)..."
+                                autofocus autocomplete="off" rows="3"></textarea>
                             <button id="btn-submit" class="btn btn-primary">
                                 <span class="btn-text">DISPATCH</span>
                                 <i class="fa-solid fa-arrow-right"></i>
                             </button>
                         </div>
-                        
+
                         <!-- Suggestion Chips -->
                         <div class="suggestion-chips">
-                            <span class="chip" data-query="What did the Supreme Court of India rule in Swiss Ribbons regarding the constitutional validity of IBC 2016?">
+                            <span class="chip"
+                                data-query="What did the Supreme Court of India rule in Swiss Ribbons regarding the constitutional validity of IBC 2016?">
                                 Swiss Ribbons (IBC Validity)
                             </span>
-                            <span class="chip" data-query="Are flat buyers considered financial creditors or operational creditors in real estate insolvencies under Indian law?">
+                            <span class="chip"
+                                data-query="Are flat buyers considered financial creditors or operational creditors in real estate insolvencies under Indian law?">
                                 Home Buyers as Creditors
                             </span>
-                            <span class="chip" data-query="What were the primary reasons for the demolition of the Supertech Twin Towers in Noida?">
+                            <span class="chip"
+                                data-query="What were the primary reasons for the demolition of the Supertech Twin Towers in Noida?">
                                 Supertech Demolition
                             </span>
-                            <span class="chip" data-query="Compare how secured and unsecured creditors are treated under the Essar Steel judgment of the Supreme Court.">
+                            <span class="chip"
+                                data-query="Compare how secured and unsecured creditors are treated under the Essar Steel judgment of the Supreme Court.">
                                 Essar Steel (Secured Creditors)
                             </span>
                         </div>
@@ -99,11 +110,14 @@
                                 <span class="dot green"></span>
                             </div>
                             <span class="terminal-title">AGENT_COGNITIVE_LOOP_LOGS.EXE</span>
-                            <span class="terminal-clear" id="btn-clear-terminal" title="Clear Screen"><i class="fa-solid fa-ban"></i></span>
+                            <span class="terminal-clear" id="btn-clear-terminal" title="Clear Screen"><i
+                                    class="fa-solid fa-ban"></i></span>
                         </div>
                         <div class="terminal-screen" id="terminal-screen">
-                            <div class="terminal-line system-line">> System initialized. Indian Legal Intelligence Center ready for dispatch.</div>
-                            <div class="terminal-line system-line">> Enter custom legal query or click a preset chip above to observe agent RAG loop.</div>
+                            <div class="terminal-line system-line">> System initialized. Indian Legal Intelligence
+                                Center ready for dispatch.</div>
+                            <div class="terminal-line system-line">> Enter custom legal query or click a preset chip
+                                above to observe agent RAG loop.</div>
                         </div>
                     </div>
                 </div>
@@ -126,13 +140,15 @@
                         <div class="library-toolbar">
                             <div class="search-box">
                                 <i class="fa-solid fa-filter"></i>
-                                <input type="text" id="library-search" placeholder="Filter by title, citation, or laws...">
+                                <input type="text" id="library-search"
+                                    placeholder="Filter by title, citation, or laws...">
                             </div>
                             <div class="toolbar-buttons">
                                 <button class="btn btn-gold" id="btn-index-all">
                                     <i class="fa-solid fa-bolt"></i> INDEX ALL 50 DOCS
                                 </button>
-                                <button class="btn btn-danger" id="btn-clear-faiss" title="Wipe FAISS vector store index and remove all indexed document facts completely">
+                                <button class="btn btn-danger" id="btn-clear-faiss"
+                                    title="Wipe FAISS vector store index and remove all indexed document facts completely">
                                     <i class="fa-solid fa-trash-can"></i> WIPE INDEX
                                 </button>
                             </div>
@@ -141,15 +157,19 @@
                         <!-- Documents Split Category Grid -->
                         <div class="library-container">
                             <div class="category-block">
-                                <h3 class="category-title text-cyan"><i class="fa-solid fa-building-columns"></i> Corporate & Insolvency Law (25 Documents)</h3>
+                                <h3 class="category-title text-cyan"><i class="fa-solid fa-building-columns"></i>
+                                    Corporate & Insolvency Law (25 Documents)</h3>
                                 <div class="docs-list" id="corp-docs-list">
-                                    <div class="loader-spinner"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading Corporate laws...</div>
+                                    <div class="loader-spinner"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading
+                                        Corporate laws...</div>
                                 </div>
                             </div>
                             <div class="category-block">
-                                <h3 class="category-title text-gold"><i class="fa-solid fa-house-chimney-window"></i> Real Estate & Property Law (25 Documents)</h3>
+                                <h3 class="category-title text-gold"><i class="fa-solid fa-house-chimney-window"></i>
+                                    Real Estate & Property Law (25 Documents)</h3>
                                 <div class="docs-list" id="re-docs-list">
-                                    <div class="loader-spinner"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading Property laws...</div>
+                                    <div class="loader-spinner"><i class="fa-solid fa-circle-notch fa-spin"></i> Loading
+                                        Property laws...</div>
                                 </div>
                             </div>
                         </div>
@@ -166,14 +186,15 @@
                                 0 / 0 vectors loaded
                             </div>
                         </div>
-                        
+
                         <div class="vector-grid-container">
                             <!-- Visual Vector List Grid -->
                             <div class="vector-grid" id="vector-grid">
                                 <div class="no-vectors-placeholder">
                                     <i class="fa-solid fa-database"></i>
                                     <p>No vectors in FAISS memory yet.</p>
-                                    <p>Index documents from the "INDIAN LEGAL CORPUS" tab or run queries with URLs to populate!</p>
+                                    <p>Index documents from the "INDIAN LEGAL CORPUS" tab or run queries with URLs to
+                                        populate!</p>
                                 </div>
                             </div>
                         </div>
@@ -200,4 +221,5 @@
     <!-- Script imports -->
     <script src="app.js"></script>
 </body>
+
 </html>
