@@ -1,5 +1,5 @@
 ================================================================================
-LEXIS-RAG: RUNNING COMPLETE SYSTEM BENCHMARK (ALL QUERIES A TO I5)
+LEXIS-RAG: RUNNING COMPLETE SYSTEM BENCHMARK (ALL QUERIES I1 TO I5) WITHOUT CORPUS
 ================================================================================
 
 ================================================================================
@@ -173,7 +173,7 @@ run 05e20e59  ─  query: In the twenty-second business-insolvency case-brief, w
 [perception]    ○ g:bf4bd8fd — Open the twenty-second business-insolvency case-brief
 [perception]    ○ g:4080e98e — Extract the size of the unpaid loan and convert it to units of ten-million
 [decision]      TOOL_CALL: search_knowledge({"query": "business insolvency case brief twenty-second entry", "k": 5})
-[action]        → 
+[action]        →
 
 ─── iter 2 ─────────────────────────────────────────────
 [memory.read]   1 hits
