@@ -45,19 +45,19 @@ async def run_all_verifications():
     print("="*80)
     print("LEXIS-RAG: BEGINNING SYSTEM VERIFICATION RUN")
     print("="*80)
-    
+
     for item in QUERIES:
         print(f"\n[VERIFY QUERY {item['id']} - {item['type']}]")
         print(f"Query: \"{item['q']}\"")
         print("-" * 50)
-        
+
         try:
             # Run the agent7 cognitive loop
             ans = await agent7.run(item['q'])
             print(f"RESULT:\n{ans}")
         except Exception as e:
             print(f"ERROR executing query: {e}")
-            
+
         print("="*80)
 
 if __name__ == "__main__":
