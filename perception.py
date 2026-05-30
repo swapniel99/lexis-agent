@@ -47,8 +47,8 @@ def _snapshot_history(history: list[dict]) -> list[dict]:
     for h in history[-10:]:
         clipped = {}
         for k, v in h.items():
-            if isinstance(v, str) and len(v) > 240:
-                clipped[k] = v[:240] + "..."
+            if isinstance(v, str) and len(v) > 2000:
+                clipped[k] = v[:2000] + "..."
             else:
                 clipped[k] = v
         out.append(clipped)

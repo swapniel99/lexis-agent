@@ -52,11 +52,12 @@ def _format_hits(hits: list[MemoryItem]) -> str:
             raw = val.get("raw")
             chunk = val.get("chunk")
             if isinstance(raw, str) and raw.strip():
-                line += f"\n      raw: {raw[:200]}"
+                raw_more = "…" if len(raw) > 2000 else ""
+                line += f"\n      raw: {raw[:2000]}{raw_more}"
             elif isinstance(chunk, str) and chunk.strip():
                 src = val.get("source") or ""
-                preview = chunk[:600].replace("\n", " ")
-                more = "…" if len(chunk) > 600 else ""
+                preview = chunk[:2000].replace("\n", " ")
+                more = "…" if len(chunk) > 2000 else ""
                 line += f"\n      chunk ({src}): {preview}{more}"
             else:
                 compact = {
@@ -123,6 +124,7 @@ def next_step(
         f"RECENT HISTORY:\n{_format_history(history)}"
         f"{_format_attached(attached)}"
     )
+
     reply = LLM().chat(
         prompt=prompt,
         system=SYSTEM,
@@ -130,7 +132,7 @@ def next_step(
         tools=mcp_tools,
         tool_choice="auto",
         auto_route="decision",
-        temperature=0.7,
+        temperature=0,
         max_tokens=2048,
     )
 

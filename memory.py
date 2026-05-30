@@ -233,24 +233,25 @@ def remember(
     schema = _Classification.model_json_schema()
     try:
         reply = _llm_classify(raw_text, schema)
-        parsed = reply.get("parsed") or {}
-        # NOTES_RUNS §6 (2): the classifier at temp=1.0 sometimes returns an
-        # empty `value` dict (the C-run-1 birthday case), discarding the only
-        # structured handle to the raw content. If `value` is empty or missing,
-        # fall back to {"raw": raw_text} so the originating text is at least
-        # always retrievable from the saved item.
-        parsed_value = parsed.get("value")
-        if not parsed_value:
-            parsed_value = {"raw": raw_text}
-        c = _Classification.model_validate({
-            "kind": parsed.get("kind", "fact"),
-            "descriptor": parsed.get("descriptor", raw_text[:120]),
-            "keywords": parsed.get("keywords") or list(_tokens(raw_text))[:10],
-            "value": parsed_value,
-        })
     except Exception as e:
         print(f"[memory.remember] classifier failed ({e!r}); falling back to fact-write")
         return _fallback_remember(raw_text, source=source, run_id=run_id, goal_id=goal_id)
+
+    parsed = reply.get("parsed") or {}
+    # NOTES_RUNS §6 (2): the classifier at temp=1.0 sometimes returns an
+    # empty `value` dict (the C-run-1 birthday case), discarding the only
+    # structured handle to the raw content. If `value` is empty or missing,
+    # fall back to {"raw": raw_text} so the originating text is at least
+    # always retrievable from the saved item.
+    parsed_value = parsed.get("value")
+    if not parsed_value:
+        parsed_value = {"raw": raw_text}
+    c = _Classification.model_validate({
+        "kind": parsed.get("kind", "fact"),
+        "descriptor": parsed.get("descriptor", raw_text[:120]),
+        "keywords": parsed.get("keywords") or list(_tokens(raw_text))[:10],
+        "value": parsed_value,
+    })
 
     embedding: list[float] | None = None
     if c.kind in _EMBEDDABLE_KINDS:
@@ -286,7 +287,7 @@ def _llm_classify(raw_text: str, schema: dict) -> dict:
             "name": "Classification",
             "strict": True,
         },
-        temperature=0.3,
+        temperature=1.0,
     )
 
 
