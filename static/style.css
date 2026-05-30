@@ -196,7 +196,7 @@ body {
 /* ── LAYOUT GRID & PANEL STRUCTURE ───────────────────────────────────────── */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1.3fr 0.7fr;
     gap: 1.5rem;
     flex-grow: 1;
 }
@@ -315,8 +315,7 @@ body {
 .input-icon {
     position: absolute;
     left: 1.2rem;
-    top: 50%;
-    transform: translateY(-50%);
+    top: 1.1rem;
     font-size: 1.1rem;
 }
 
@@ -325,11 +324,14 @@ body {
     background: rgba(15, 23, 42, 0.6);
     border: 1px solid rgba(212, 175, 55, 0.25);
     border-radius: var(--radius-md);
-    padding: 1rem 8rem 1rem 3rem;
+    padding: 1rem 9rem 1rem 3rem;
     font-family: 'Outfit', sans-serif;
     color: var(--text-primary);
     font-size: 0.95rem;
     transition: var(--transition-smooth);
+    resize: none;
+    height: 96px;
+    line-height: 1.4;
 }
 
 #query-input:focus {
@@ -341,10 +343,9 @@ body {
 
 #btn-submit {
     position: absolute;
-    right: 0.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    padding: 0.5rem 1rem;
+    right: 0.6rem;
+    bottom: 0.6rem;
+    padding: 0.5rem 1.2rem;
 }
 
 /* Suggestion Chips */

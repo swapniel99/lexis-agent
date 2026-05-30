@@ -212,14 +212,15 @@ def clear_all_state():
 @app.post("/api/query")
 async def run_agent_query(payload: QueryRequest):
     """
-    Runs the agent7.py cognitive loop as a subprocess, capturing and streaming
-    the full step-by-step console logs to the UI using Server-Sent Events (SSE).
+    Runs the agent7.py cognitive loop as a subprocess in UNBUFFERED mode (-u),
+    capturing and streaming the full step-by-step console logs to the UI live
+    using Server-Sent Events (SSE).
     """
     query_str = payload.query
 
     async def _event_generator():
-        # Spawn agent7.py as an external process to capture stdout in real-time
-        cmd = [sys.executable, "agent7.py", query_str]
+        # Spawn agent7.py as an external process with -u for unbuffered live streaming
+        cmd = [sys.executable, "-u", "agent7.py", query_str]
         
         try:
             process = await asyncio.create_subprocess_exec(

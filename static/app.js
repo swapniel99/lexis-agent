@@ -129,12 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return `
             <div class="doc-card">
                 <div class="doc-info">
-                    <span class="doc-title">${doc.title}</span>
-                    <span class="doc-meta">
-                        <span class="badge">${doc.id}</span>
-                        <span>Citation: ${doc.filename.split("_").slice(2).join(" ").replace(".md", "").toUpperCase()}</span>
-                        <span>Size: ${(doc.size_bytes / 1024).toFixed(1)} KB</span>
-                    </span>
+                    <span class="doc-title" title="${doc.title}">${doc.title}</span>
                 </div>
                 <div class="doc-actions">
                     <button class="btn-icon btn-view" data-filename="${doc.filename}" title="View Document text">
@@ -345,32 +340,48 @@ document.addEventListener("DOMContentLoaded", () => {
         terminalScreen.scrollTop = terminalScreen.scrollHeight;
     }
 
-    // Parse standard agent print statements and apply futuristic HUD colors
+    // Parse standard agent print statements and apply HUD colors
     function colorCodeAndAppend(rawLine) {
         const line = rawLine.trim();
         if (!line) return;
 
-        // Skip standard empty loops or clean boundaries
-        if (line.startsWith("═")) {
-            appendTerminalLine(rawLine, "header-line");
+        // 1. DISCARD redundant / low-signal lines
+        if (line.startsWith("══")) return; // skip raw horizontal dividers
+        if (line.startsWith("[mcp] loaded")) return; // skip initial tool list load
+        if (line.startsWith("run ") && line.includes("query:")) return; // skip duplicate run headers
+        
+        // Filter completed goals (✓) to prevent terminal cluttering as iterations grow
+        if (line.startsWith("[perception]") && line.includes("✓")) return;
+
+        // 2. Format high-signal logs beautifully
+        if (line.startsWith("─── iter")) {
+            appendTerminalLine(`\n${line}`, "header-line");
             return;
         }
 
-        if (line.startsWith("run ") || line.startsWith("FINAL:")) {
-            appendTerminalLine(rawLine, "header-line");
+        if (line.startsWith("FINAL:")) {
+            appendTerminalLine(`\n>> RESOLUTION:\n${line.replace("FINAL:", "").trim()}\n`, "header-line");
             return;
         }
 
         if (line.startsWith("[perception]")) {
-            appendTerminalLine(rawLine, "p-line");
+            // Display active target goals
+            appendTerminalLine(line.replace("[perception]", "[Perception]"), "p-line");
         } else if (line.startsWith("[decision]")) {
-            appendTerminalLine(rawLine, "d-line");
+            appendTerminalLine(line.replace("[decision]", "[Decision]  "), "d-line");
         } else if (line.startsWith("[action]")) {
-            appendTerminalLine(rawLine, "a-line");
-        } else if (line.startsWith("[memory") || line.startsWith("[attach")) {
-            appendTerminalLine(rawLine, "m-line");
+            appendTerminalLine(line.replace("[action]", "[Action]    "), "a-line");
+        } else if (line.startsWith("[memory.read]")) {
+            appendTerminalLine(line.replace("[memory.read]", "[Memory]    "), "m-line");
+        } else if (line.startsWith("[attach]")) {
+            appendTerminalLine(line.replace("[attach]", "[Context]   "), "m-line");
+        } else if (line.startsWith("[done]")) {
+            appendTerminalLine(`\n>> ${line.toUpperCase()}`, "header-line");
         } else {
-            appendTerminalLine(rawLine, "system-line");
+            // Forward other relevant progress info
+            if (!line.includes("[memory.remember]") && !line.includes("[memory.record_outcome]")) {
+                appendTerminalLine(line, "system-line");
+            }
         }
     }
 
@@ -444,9 +455,10 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     queryInput.onkeydown = (e) => {
-        if (e.key === "Enter") {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault(); // prevent new line from being added
             const text = queryInput.value.trim();
-            if (text) dispatchQuery(text);
+            if (text && !isAgentRunning) dispatchQuery(text);
         }
     };
 
