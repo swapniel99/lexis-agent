@@ -5,8 +5,9 @@
 
 # runtime state
 state/
-# sandbox/*
+sandbox/*
 !sandbox/papers/
+!sandbox/real_documents/
 usage.json
 
 # python

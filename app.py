@@ -174,10 +174,37 @@ def get_memory_state():
 
 @app.post("/api/clear")
 def clear_all_state():
-    """Wipe memories and the FAISS vector index clean."""
+    """Wipe memories, FAISS indexes, artifacts, and temporary sandbox text files clean."""
     try:
+        # 1. Clear memory JSON and FAISS indexes via memory.py
         _memory.clear()
-        return {"ok": True, "message": "Durable memory and FAISS vector index wiped clean"}
+        
+        # 2. Delete state artifacts directory recursively
+        artifacts_dir = STATE_DIR / "artifacts"
+        if artifacts_dir.exists():
+            import shutil
+            shutil.rmtree(artifacts_dir)
+            artifacts_dir.mkdir(exist_ok=True)
+            
+        # 3. Delete any general JSON files left in state directory (like any temp logs)
+        for child in STATE_DIR.iterdir():
+            if child.suffix == ".json" and child.name not in ("memory.json", "index_ids.json"):
+                try:
+                    child.unlink()
+                except Exception:
+                    pass
+                    
+        # 4. Clear any temporary .txt files in the sandbox directory
+        sandbox_dir = Path(__file__).parent / "sandbox"
+        if sandbox_dir.exists():
+            for child in sandbox_dir.iterdir():
+                if child.suffix == ".txt":
+                    try:
+                        child.unlink()
+                    except Exception:
+                        pass
+                        
+        return {"ok": True, "message": "Global state completely wiped (FAISS index, memory.json, artifacts, and sandbox .txt files)"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
