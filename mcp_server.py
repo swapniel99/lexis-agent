@@ -31,7 +31,10 @@ from zoneinfo import ZoneInfo
 import httpx
 from ddgs import DDGS
 from dotenv import load_dotenv
+import logging
 from mcp.server.fastmcp import FastMCP
+
+logging.basicConfig(level=logging.WARNING)
 
 # Same-directory imports for the Memory and Artifact services so that the
 # new index_document / search_knowledge tools can delegate into them.
@@ -44,7 +47,7 @@ MAX_SEARCH_RESULTS = 5  # hard cap — Tavily prices per result
 
 load_dotenv(Path(__file__).parent / ".env")
 
-mcp = FastMCP("eagv3-s7-server")
+mcp = FastMCP("eagv3-s7-server", log_level="WARNING")
 
 SANDBOX = Path(__file__).parent / "sandbox"
 SANDBOX.mkdir(exist_ok=True)
