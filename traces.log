@@ -6,7 +6,7 @@ LEXIS-RAG: RUNNING COMPLETE SYSTEM BENCHMARK (ALL QUERIES A TO I5)
 === RUNNING SESSION 7 GENERAL EVALUATION QUERIES ===
 ================================================================================
 
-=== Query A: Time in Tokyo and Bangalore ===
+=== Query A ===
 Clearing state in directory: /Users/swapniel/git/lexis-agent
 State cleared.
 Query [a]: Fetch https://en.wikipedia.org/wiki/Claude_Shannon and tell me his birth date, death date, and three key contributions to information theory.
@@ -57,7 +57,7 @@ His three key contributions to information theory include:
 ══════════════════════════════════════════════════════════════════════════════
 
 
-=== Query B: Currency Conversion (USD to INR) ===
+=== Query B ===
 Clearing state in directory: /Users/swapniel/git/lexis-agent
 State cleared.
 Query [b]: Find 3 family-friendly things to do in Tokyo this weekend. Check Saturday's weather forecast there and tell me which one is most appropriate.
@@ -123,7 +123,7 @@ Based on this favorable weather, **Ueno Park** is an excellent choice for a fami
 ══════════════════════════════════════════════════════════════════════════════
 
 
-=== Query C1: Anita Sen Contract Dispute (Setup) ===
+=== Query C1 ===
 Clearing state in directory: /Users/swapniel/git/lexis-agent
 State cleared.
 Query [c1]: My mom's birthday is 15 May 2026. Remember that and create reminders for two weeks before and on the day.
@@ -174,7 +174,7 @@ FINAL: I have successfully set the reminders for your mother's birthday. You hav
 ══════════════════════════════════════════════════════════════════════════════
 
 
-=== Query C2: Anita Sen Contract Defense (no-clear follow-up) ===
+=== Query C2 ===
 Query [c2]: When is mom's birthday?
 
 
@@ -207,7 +207,7 @@ FINAL: Mom's birthday is on **15 May 2026**. The reminders for two weeks bef
 ══════════════════════════════════════════════════════════════════════════════
 
 
-=== Query D: Supertech and Amrapali Comparison ===
+=== Query D ===
 Clearing state in directory: /Users/swapniel/git/lexis-agent
 State cleared.
 Query [d]: Search for "Python asyncio best practices", read the top 3 results, and give me a short numbered list of the advice they agree on.
@@ -284,7 +284,7 @@ FINAL: Based on the provided resources, here is the common advice for working wi
 ══════════════════════════════════════════════════════════════════════════════
 
 
-=== Query E: Swiss Ribbons and Essar Steel Comparison ===
+=== Query E ===
 Clearing state in directory: /Users/swapniel/git/lexis-agent
 State cleared.
 Query [e]: Index the file papers/attention.md and tell me what the three key contributions of the Transformer architecture are according to this paper.
@@ -338,7 +338,7 @@ FINAL: Based on the abstract of the paper "Attention Is All You Need," the three
 ══════════════════════════════════════════════════════════════════════════════
 
 
-=== Query F1: Multi-turn Context Memory Test (Setup) ===
+=== Query F1 ===
 Clearing state in directory: /Users/swapniel/git/lexis-agent
 State cleared.
 Query [f1]: Index every .md file under papers/. Confirm how many chunks were indexed in total.
@@ -465,7 +465,7 @@ This is based on the indexing of 5 files (`papers/attention.md`, `papers/cot.md`
 ══════════════════════════════════════════════════════════════════════════════
 
 
-=== Query F2: Multi-turn Context Memory Test (no-clear follow-up) ===
+=== Query F2 ===
 Query [f2]: Across the papers I have indexed, what do they say about chain-of-thought reasoning?
 
 
@@ -506,7 +506,7 @@ Key findings regarding this approach include:
 ══════════════════════════════════════════════════════════════════════════════
 
 
-=== Query G: Financial Creditors vs Operational Creditors ===
+=== Query G ===
 Clearing state in directory: /Users/swapniel/git/lexis-agent
 State cleared.
 Query [g]: Across these papers, how do they handle the credit assignment problem?
@@ -560,7 +560,7 @@ In summary, the field is shifting from simple temporal heuristics toward more so
 ══════════════════════════════════════════════════════════════════════════════
 
 
-=== Query H: ReAct vs Chain-of-Thought Comparison ===
+=== Query H ===
 Clearing state in directory: /Users/swapniel/git/lexis-agent
 State cleared.
 Query [h]: Compare how the ReAct paper and the Chain-of-Thought paper differ in their treatment of intermediate reasoning.
