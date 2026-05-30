@@ -69,3 +69,6 @@ The complete trace logs for all system evaluation queries (Query A to Query I5) 
 
 You can view the detailed execution logs here:
 👉 **[traces.log](traces.log)**
+
+You can also view the detailed execution logs without corpus in RAG.
+👉 **[traces_no_corpus.log](traces_no_corpus.log)**
