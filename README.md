@@ -4,6 +4,10 @@ LEXIS-RAG is a professional, high-stakes RAG (Retrieval-Augmented Generation) ap
 
 The application features a stunning, modern **obsidian-dark glassmorphic dashboard** with a live retro-terminal streaming logs of the agent's cognitive loops, alongside a dynamic FAISS vector memory map.
 
+## 🎥 Video Demo
+
+Watch the Lexis-RAG agent in action demonstrating its PDMA cognitive architecture: 👉 **[Lexis-RAG YouTube Demo Video](https://www.youtube.com/watch?v=EncdNiZFuSI)**
+
 ## 📂 Seminal Indian Legal Corpus Manifest
 
 The complete registry of the 50 Indian corporate and real estate landmark cases indexed in the RAG system can be found in the standalone manifest file:
