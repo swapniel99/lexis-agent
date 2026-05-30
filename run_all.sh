@@ -4,7 +4,7 @@ set -e
 echo "================================================================================"
 echo "LEXIS-RAG: RUNNING COMPLETE SYSTEM BENCHMARK (ALL QUERIES A TO I5)"
 echo "================================================================================"
-sleep 3
+sleep 10
 
 DIR="$(dirname "$0")"
 
