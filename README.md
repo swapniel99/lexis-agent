@@ -60,3 +60,12 @@ The complete registry of the 50 Indian corporate and real estate landmark cases 
 * **Wiping & Re-indexing**:
   * You can wipe the global state (including FAISS index, memory.json, cached artifacts, and temporary text files) by clicking the **WIPE STATE** button.
   * You can trigger background indexing of all 50 documents at any time by clicking **INDEX ALL 50 DOCS** and watching the vectors increase live in the HUD header!
+
+---
+
+## 📋 System Benchmark Traces
+
+The complete trace logs for all system evaluation queries (Query A to Query I5) have been generated successfully.
+
+You can view the detailed execution logs here:
+👉 **[traces.log](traces.log)**
