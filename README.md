@@ -7,7 +7,7 @@ The application features a stunning, modern **obsidian-dark glassmorphic dashboa
 ## 📂 Seminal Indian Legal Corpus Manifest
 
 The complete registry of the 50 Indian corporate and real estate landmark cases indexed in the RAG system can be found in the standalone manifest file:
-👉 **[Seminal Indian Legal Corpus Manifest (50 Documents)](file:///Users/swapniel/git/S7code/corpus_manifest.md)**
+👉 **[Seminal Indian Legal Corpus Manifest (50 Documents)](corpus_manifest.md)**
 
 ---
 
