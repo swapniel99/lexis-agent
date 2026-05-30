@@ -14,52 +14,52 @@ echo "=== RUNNING SESSION 7 GENERAL EVALUATION QUERIES ==="
 echo "================================================================================"
 
 echo ""
-echo "=== Query A: Time in Tokyo and Bangalore ==="
+echo "=== Query A ==="
 bash "$DIR/run_query.sh" a
 sleep 2
 
 echo ""
-echo "=== Query B: Currency Conversion (USD to INR) ==="
+echo "=== Query B ==="
 bash "$DIR/run_query.sh" b
 sleep 2
 
 echo ""
-echo "=== Query C1: Anita Sen Contract Dispute (Setup) ==="
+echo "=== Query C1 ==="
 bash "$DIR/run_query.sh" c1
 sleep 2
 
 echo ""
-echo "=== Query C2: Anita Sen Contract Defense (no-clear follow-up) ==="
+echo "=== Query C2 ==="
 bash "$DIR/run_query.sh" c2 --no-clear
 sleep 2
 
 echo ""
-echo "=== Query D: Supertech and Amrapali Comparison ==="
+echo "=== Query D ==="
 bash "$DIR/run_query.sh" d
 sleep 2
 
 echo ""
-echo "=== Query E: Swiss Ribbons and Essar Steel Comparison ==="
+echo "=== Query E ==="
 bash "$DIR/run_query.sh" e
 sleep 2
 
 echo ""
-echo "=== Query F1: Multi-turn Context Memory Test (Setup) ==="
+echo "=== Query F1 ==="
 bash "$DIR/run_query.sh" f1
 sleep 2
 
 echo ""
-echo "=== Query F2: Multi-turn Context Memory Test (no-clear follow-up) ==="
+echo "=== Query F2 ==="
 bash "$DIR/run_query.sh" f2 --no-clear
 sleep 2
 
 echo ""
-echo "=== Query G: Financial Creditors vs Operational Creditors ==="
+echo "=== Query G ==="
 bash "$DIR/run_query.sh" g
 sleep 2
 
 echo ""
-echo "=== Query H: ReAct vs Chain-of-Thought Comparison ==="
+echo "=== Query H ==="
 bash "$DIR/run_query.sh" h
 sleep 2
 
