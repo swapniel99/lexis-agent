@@ -132,7 +132,7 @@ def next_step(
         tools=mcp_tools,
         tool_choice="auto",
         auto_route="decision",
-        temperature=0,
+        temperature=0.3,
         max_tokens=2048,
     )
 
